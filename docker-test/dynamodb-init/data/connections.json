@@ -1,0 +1,20 @@
+{
+  "connId": {
+    "S": "connId1234567890"
+  },
+  "userId": {
+    "N": 1
+  },
+  "userUid": {
+    "S": "userUid1234567890"
+  },
+  "expireAt": {
+    "N": 1715769600
+  },
+  "createdAt": {
+    "N": 1715769600
+  },
+  "updatedAt": {
+    "N": 1715769600
+  }
+}

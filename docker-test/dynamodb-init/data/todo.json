@@ -1,0 +1,14 @@
+{
+  "PK": {
+    "S": "TODO"
+  },
+  "SK": {
+    "S": "ID#20240925120000-1234567-abcd-efgh-1234-abcde12345"
+  },
+  "title": {
+    "S": "Hello World"
+  },
+  "content": {
+    "S": "This is dynamo db migration data"
+  }
+}

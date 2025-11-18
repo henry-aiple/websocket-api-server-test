@@ -1,0 +1,57 @@
+{
+  "env": "test",
+  "port": 3000,
+  "db": {
+    "dbConn": "xinobi?connectTimeout=60000&timezone=Z&multipleStatements=true",
+    "writer": "mysql://root:password@127.0.0.1/",
+    "reader": "mysql://root:password@127.0.0.1/"
+  },
+  "mongodb": {
+    "host": "mongodb://localhost:27017/xinobi",
+    "tls": false,
+    "caCert": "rds-combined-ca-bundle.pem"
+  },
+  "dynamodb": {
+    "endpoint": "http://localhost:8000",
+    "tableName": "wsConnection"
+  },
+  "auth": {
+    "token": {
+      "secret": "xinobi",
+      "accessTokenEx": "1 days",
+      "iss": "xinobi"
+    }
+  },
+  "internal": {
+    "auth": "c3BhcmtyLWRldjpkZXZhaXBsZTE3MQ=="
+  },
+  "aws": {
+    "config": {
+      "region": "ap-northeast-2",
+      "credentials": {
+        "accessKeyId": "FAKEID",
+        "secretAccessKey": "FAKEKEY"
+      }
+    },
+    "services": {}
+  },
+  "webClient": {
+    "baseUrl": "https://xinobi.aiple.link",
+    "reportEndpoint": "/report/${researchId}"
+  },
+  "slack": {
+    "baseHookUrl": "https://hooks.slack.com/services/T04032BNY/",
+    "tiktokResearchReq": {
+      "hookUrl": "B099TH5N2QP/JoVTtqoM513Ww5lo2k0xh3Hx",
+      "slackChannel": "012_newbiz_test"
+    },
+    "tiktokResearchDone": {
+      "hookUrl": "B099TH5N2QP/JoVTtqoM513Ww5lo2k0xh3Hx",
+      "slackChannel": "012_newbiz_test"
+    },
+    "tiktokCustom": {
+      "hookUrl": "B099TH5N2QP/JoVTtqoM513Ww5lo2k0xh3Hx",
+      "slackChannel": "012_newbiz_test"
+    }
+  }
+}

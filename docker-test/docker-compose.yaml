@@ -1,0 +1,54 @@
+# version: '2'
+
+networks:
+  xinobi-docker-test:
+
+services:
+  mysql:
+    #platform: linux/amd64
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: xinobi
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    tty: false
+
+  dynamodb-local: # DynamoDB Container
+    image: amazon/dynamodb-local # DynamoDB Image
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000" # port mapping
+    healthcheck: # health check, before running the initialization script, check if DynamoDB is ready by ping command
+      test: [ "CMD-SHELL", '[ "$(curl -s -o /dev/null -I -w ''%{http_code}'' http://localhost:8000)" == "400" ]' ]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+    command: "-jar DynamoDBLocal.jar -inMemory -sharedDb" # DynamoDB run command, internally run DynamoDBLocal.jar
+
+  setup-dynamo: # Database initialization container
+    image: amazon/aws-cli # CLI Image
+    depends_on:
+      dynamodb-local:
+        condition: service_healthy # after running the dynamodb-local container, run the initialization script after waiting for the health check to complete.
+    environment: # Environment variables, prepare environment variables needed for CLI execution.
+      AWS_ACCESS_KEY_ID: FAKEID
+      AWS_SECRET_ACCESS_KEY: FAKEKEY
+      AWS_DEFAULT_REGION: ap-northeast-2
+    entrypoint: ["/bin/sh","-c"] # use sh shell
+    volumes: # share the initialization script location as a volume.
+      - ./dynamodb-init:/aws/init
+    command: # run the initialization script.
+      - |
+        sh ./init/create-table.sh
+        sh ./init/migration-data.sh
