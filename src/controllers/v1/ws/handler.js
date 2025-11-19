@@ -1,8 +1,11 @@
+
 import logger from '../../../tools/logger.js';
+import wsConnectionModel from '../../../../models/wsConnection.js';
 import {
   getConnectionByConnId,
   sendMessage,
-} from '../../../backend/aws/websocket-api/websocketApi.js';
+} from '../../../backend/aws/websocket-api/index.js';
+import {v4 as uuidv4} from 'uuid';
 
 // This handler will be called when a client connects to the WebSocket
 export const connectHandler = async (req, res) => {
@@ -27,14 +30,14 @@ export const connectHandler = async (req, res) => {
     const {connectionId} = req.body;
     console.log(`connectionId: ${connectionId}`);
 
-    // const userId = Math.floor(Math.random() * 1000000); // for example, 0 - 999999
-    // const userUid = uuidv4(); // Generate a random UUID
+    const userId = Math.floor(Math.random() * 1000000); // for example, 0 - 999999
+    const userUid = uuidv4(); // Generate a random UUID
 
-    // await wsConnectionModel.addItem({
-    //   connId: connectionId,
-    //   userId,
-    //   userUid,
-    // });
+    await wsConnectionModel.addItem({
+      connId: connectionId,
+      userId,
+      userUid,
+    });
 
     return res.status(200).json({
       result: 'success',
@@ -53,7 +56,7 @@ export const connectHandler = async (req, res) => {
 export const disconnectHandler = async (req, res) => {
   try {
     const {connectionId} = req.body;
-    // await wsConnectionModel.deleteByConnId(connectionId);
+    await wsConnectionModel.deleteByConnId(connectionId);
     return res.status(200).json({
       result: 'success',
       message: 'WebSocket disconnected',

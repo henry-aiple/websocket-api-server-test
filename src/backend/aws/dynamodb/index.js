@@ -20,7 +20,7 @@ import {inspect} from 'util';
 const awsConfig = config.aws.config;
 const client = new DynamoDBClient({
   ...awsConfig,
-  endpoint: config.dynamodb.endpoint,
+  ...(config.env === 'test' ? {endpoint: config.dynamodb.endpoint} : {}),
 });
 
 const docClient = DynamoDBDocumentClient.from(client);
