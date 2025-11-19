@@ -7,12 +7,12 @@ import wsHandlerController from '../../../controllers/v1/ws/handler.js';
 // router.use(auth.authenticateWithBasic);
 
 router.route('/connect')
-  .get(wsHandlerController.connect);
+  .post(wsHandlerController.connectHandler);
 
 router.route('/disconnect')
-  .post(wsHandlerController.disconnect);
+  .post(wsHandlerController.disconnectHandler);
 
 router.route('/default')
-  .post(wsHandlerController.sendMessage);
+  .post(wsHandlerController.defaultHandler);
 
 export default router;

@@ -1,10 +1,23 @@
-import {ApiGatewayManagementApiClient, GetConnectionCommand}
+import {
+  ApiGatewayManagementApiClient, GetConnectionCommand, PostToConnectionCommand,
+}
   from '@aws-sdk/client-apigatewaymanagementapi';
-import config from '../../tools/config.js';
-import logger from '../../tools/logger.js';
+import config from '../../../tools/config.js';
+import logger from '../../../tools/logger.js';
 
 const awsConfig = config.aws.config;
-const client = new ApiGatewayManagementApiClient(awsConfig);
+const client = new ApiGatewayManagementApiClient({
+  ...awsConfig,
+  endpoint: config.websocketApi.endpoint,
+});
+
+export const getConnectionByConnId = async (connectionId) => {
+  const params = {
+    ConnectionId: connectionId,
+  };
+  const command = new GetConnectionCommand(params);
+  return await client.send(command);
+};
 
 export const sendMessage = async (connectionId, message) => {
   try {
@@ -21,7 +34,7 @@ export const sendMessage = async (connectionId, message) => {
       })(),
     };
 
-    const command = new GetConnectionCommand(params);
+    const command = new PostToConnectionCommand(params);
     return await client.send(command);
   } catch (err) {
     logger.error(`Failed to send message to connection ${connectionId}: ${err}`);
@@ -30,5 +43,6 @@ export const sendMessage = async (connectionId, message) => {
 };
 
 export default {
+  getConnectionByConnId,
   sendMessage,
 };

@@ -19,7 +19,7 @@
   "license": "All rights reserved by Aiple Inc.",
   "private": true,
   "dependencies": {
-    "@aws-sdk/client-apigatewaymanagementapi": "^3.927.0",
+    "@aws-sdk/client-apigatewaymanagementapi": "^3.934.0",
     "@aws-sdk/client-dynamodb": "^3.927.0",
     "@aws-sdk/client-ssm": "^3.933.0",
     "@aws-sdk/lib-dynamodb": "^3.927.0",

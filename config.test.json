@@ -15,6 +15,9 @@
     "endpoint": "http://localhost:8000",
     "tableName": "wsConnection"
   },
+  "websocketApi": {
+    "endpoint": "https://vmyyc8jhsi.execute-api.ap-northeast-2.amazonaws.com/test/@connections"
+  },
   "auth": {
     "token": {
       "secret": "xinobi",

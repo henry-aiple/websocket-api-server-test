@@ -1,14 +1,17 @@
-// import wsConnectionModel from '../../../../models/wsConnection.js';
-// import {v4 as uuidv4} from 'uuid';
 import logger from '../../../tools/logger.js';
+import {
+  getConnectionByConnId,
+  sendMessage,
+} from '../../../backend/aws/websocket-api/websocketApi.js';
 
 // This handler will be called when a client connects to the WebSocket
-export const connect = async (req, res) => {
+export const connectHandler = async (req, res) => {
   try {
-    logger.info(`req.query: ${JSON.stringify(req.query)}`);
-    logger.info(`req.headers: ${JSON.stringify(req.headers)}`);
+    // logger.info(`req.query: ${JSON.stringify(req.query)}`);
+    // logger.info(`req.body: ${JSON.stringify(req.body)}`);
+    // logger.info(`req.headers: ${JSON.stringify(req.headers)}`);
 
-    const {token} = req.query;
+    const token = req.body.authenticatedToken;
     if (!token) {
       return res.status(401).json({
         error: 'Token is required',
@@ -21,7 +24,7 @@ export const connect = async (req, res) => {
       });
     }
 
-    const connectionId = req.headers['sec-websocket-key'];
+    const {connectionId} = req.body;
     console.log(`connectionId: ${connectionId}`);
 
     // const userId = Math.floor(Math.random() * 1000000); // for example, 0 - 999999
@@ -47,9 +50,9 @@ export const connect = async (req, res) => {
 };
 
 // This handler will be called when a client disconnects from the WebSocket
-export const disconnect = async (req, res) => {
+export const disconnectHandler = async (req, res) => {
   try {
-    const connectionId = req.headers['sec-websocket-key'];
+    const {connectionId} = req.body;
     // await wsConnectionModel.deleteByConnId(connectionId);
     return res.status(200).json({
       result: 'success',
@@ -65,12 +68,23 @@ export const disconnect = async (req, res) => {
 };
 
 // This handler is for sending/receiving messages over the WebSocket
-export const sendMessage = async (req, res) => {
+export const defaultHandler = async (req, res) => {
   try {
     // Example: echoing the received message
     logger.info(`req.body: ${JSON.stringify(req.body)}`);
-    const message = req.body && req.body.message ? req.body.message : 'No message provided';
+    const message = req.body && req.body.data ? req.body.data : 'No message provided';
     logger.info(`message: ${message}`);
+
+    const {connectionId} = req.body;
+    console.log(`connectionId: ${connectionId}`);
+
+    const connection = await getConnectionByConnId(connectionId);
+    console.log(`connection: ${JSON.stringify(connection)}`);
+
+    setTimeout(function() {
+      sendMessage(connectionId, '3 seconds later');
+    }, 3000);
+
     return res.status(200).json({
       result: 'success',
       message: 'Message received',
@@ -85,7 +99,7 @@ export const sendMessage = async (req, res) => {
 };
 
 export default {
-  connect,
-  disconnect,
-  sendMessage,
+  connectHandler,
+  disconnectHandler,
+  defaultHandler,
 };
