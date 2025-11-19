@@ -51,6 +51,7 @@ function getGsiKeys(schema) {
   const {globalSecondaryIndexes} = schema;
   return globalSecondaryIndexes.map((index) => {
     return {
+      indexName: index.indexName,
       partitionKey: index.partitionKey,
       sortKey: index.sortKey,
     };
@@ -132,9 +133,21 @@ function validateQueryParams(schema, params) {
   if (!queryKey || !queryValue) {
     throw new Error(`key and value are required`);
   }
-  if (partitionKey !== queryKey && !gsiKeyNames.includes(queryKey)) {
+  const isPartitionKey = partitionKey === queryKey;
+  const isGsiPartitionKey = gsiKeyNames.includes(queryKey);
+
+  if (!isPartitionKey && !isGsiPartitionKey) {
     throw new Error(`queryKey is invalid: ${queryKey}`);
   }
+
+  if (isGsiPartitionKey) {
+    const gsi = gsiKeys.find((gsiKey) => gsiKey.partitionKey === queryKey);
+    params.indexName = gsi?.indexName;
+    if (!params.indexName) {
+      throw new Error(`indexName is required for GSI query: ${queryKey}`);
+    }
+  }
+
   if (querySortKey) {
     const isValidSortKey = querySortKey === sortKey || gsiSortKeyNames.includes(querySortKey);
     if (!isValidSortKey) {
@@ -151,7 +164,7 @@ function validateQueryParams(schema, params) {
     }
   }
 
-  return true;
+  return params;
 }
 
 function validateUpdateParams(schema, params) {
@@ -177,7 +190,7 @@ function validateUpdateParams(schema, params) {
       throw new Error(`Invalid attribute value type for key '${key}': ${typeof value}`);
     }
   }
-  return true;
+  return params;
 };
 
 
@@ -193,6 +206,7 @@ export const getItem = async (schema, params) => {
     }
     const command = new GetCommand({
       TableName: schema.tableName,
+      ...(isNotNullOrUndefined(params.indexName) ? {IndexName: params.indexName} : {}),
       Key,
     });
     const result = await docClient.send(command);
@@ -233,6 +247,7 @@ export const queryItems = async (schema, params) => {
 
     const command = new QueryCommand({
       TableName: schema.tableName,
+      ...(isNotNullOrUndefined(params.indexName) ? {IndexName: params.indexName} : {}),
       KeyConditionExpression: keyConditionClauses.join(' AND '),
       ExpressionAttributeValues: expressionAttributeValues,
     });
@@ -337,6 +352,7 @@ export const updateItem = async (schema, params) => {
 
   const updateItemCommand = new UpdateCommand({
     TableName: schema.tableName,
+    ...(isNotNullOrUndefined(params.indexName) ? {IndexName: params.indexName} : {}),
     Key: {
       [params.queryKey]: params.queryValue,
       ...(isNotNullOrUndefined(params.querySortKey) ?
@@ -377,6 +393,7 @@ export const deleteItem = async (schema, params) => {
   try {
     const deleteItemCommand = new DeleteCommand({
       TableName: schema.tableName,
+      ...(isNotNullOrUndefined(params.indexName) ? {IndexName: params.indexName} : {}),
       Key: {
         [params.queryKey]: params.queryValue,
         ...(isNotNullOrUndefined(params.querySortKey) ?

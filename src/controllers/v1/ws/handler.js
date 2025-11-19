@@ -39,6 +39,9 @@ export const connectHandler = async (req, res) => {
       userUid,
     });
 
+    const onnectionByUserUid = await wsConnectionModel.getByUserUid(userUid);
+    console.log(`onnectionByUserUid: ${JSON.stringify(onnectionByUserUid)}`);
+
     return res.status(200).json({
       result: 'success',
       message: 'WebSocket connected',
