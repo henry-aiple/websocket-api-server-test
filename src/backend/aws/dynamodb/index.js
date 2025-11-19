@@ -286,8 +286,8 @@ export const putItem = async (schema, data) => {
     // Get the current time in epoch second format
     const curTime = Math.floor(new Date().getTime() / 1000);
 
-    // Calculate the expireAt time (90 days from now) in epoch second format
-    const expireAt = Math.floor((new Date().getTime() + 90 * 24 * 60 * 60 * 1000) / 1000);
+    // Calculate the expireAt time (3 hours from now) in epoch second format
+    const expireAt = Math.floor((Date.now() + 3 * 60 * 60 * 1000) / 1000);
 
     // Create DynamoDB item using native JS types, not AttributeValue format.
     // DynamoDBDocumentClient (PutCommand) expects plain JS object.
